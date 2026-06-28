@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI / ML Engineering — Interview Field Manual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#13171F;
+    --ink-soft:#3C4654;
+    --ink-faint:#6B7585;
+    --paper:#FCFBF8;
+    --page:#EBEDF1;
+    --card:#FFFFFF;
+    --line:#E4E6EC;
+    --line-strong:#D2D6DF;
+    --shell:#10141B;
+    --shell-2:#171C25;
+    --shell-line:#262E3A;
+    --shell-text:#AEB7C6;
+    --shell-faint:#6A7689;
+
+    /* domain accents */
+    --c-llm:#6D5DD3;
+    --c-rag:#13A294;
+    --c-mlops:#DD7C20;
+    --c-dl:#D43F66;
+    --c-py:#2A72D4;
+
+    --radius:14px;
+    --shadow:0 1px 2px rgba(16,20,27,.04), 0 8px 28px rgba(16,20,27,.06);
+    --shadow-lift:0 4px 12px rgba(16,20,27,.08), 0 18px 50px rgba(16,20,27,.10);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--page);
+    color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+
+  .layout{
+    display:grid;
+    grid-template-columns:288px 1fr;
+    min-height:100vh;
+  }
+
+  /* ---------- Sidebar (dark shell) ---------- */
+  .sidebar{
+    background:var(--shell);
+    color:var(--shell-text);
+    border-right:1px solid var(--shell-line);
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow-y:auto;
+    padding:26px 22px 30px;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+  .brand{display:flex;flex-direction:column;gap:10px;}
+  .brand .tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--shell-faint);
+  }
+  .brand h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;font-size:22px;line-height:1.15;color:#F4F6FA;margin:0;
+    letter-spacing:-.01em;
+  }
+  .brand .sub{font-size:12.5px;color:var(--shell-faint);line-height:1.45;}
+
+  .progress-wrap{display:flex;flex-direction:column;gap:8px;}
+  .progress-meta{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--shell-faint);
+    letter-spacing:.04em;
+  }
+  .progress-meta b{color:#EAF0F8;font-weight:600;font-size:13px;}
+  .progress-track{height:6px;background:#222A35;border-radius:99px;overflow:hidden;}
+  .progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--c-llm),var(--c-py));border-radius:99px;transition:width .4s cubic-bezier(.2,.7,.3,1);}
+
+  .nav{display:flex;flex-direction:column;gap:2px;}
+  .nav .nav-label{
+    font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--shell-faint);margin:4px 6px 8px;
+  }
+  .nav a{
+    display:flex;align-items:center;gap:11px;
+    text-decoration:none;color:var(--shell-text);
+    padding:9px 11px;border-radius:9px;font-size:13.5px;font-weight:450;
+    transition:background .15s,color .15s;
+  }
+  .nav a:hover{background:var(--shell-2);color:#F2F5FA;}
+  .nav a .dot{width:9px;height:9px;border-radius:3px;flex:none;box-shadow:0 0 0 3px rgba(255,255,255,.04);}
+  .nav a .n{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--shell-faint);}
+
+  .side-foot{margin-top:auto;font-size:11px;color:var(--shell-faint);line-height:1.5;border-top:1px solid var(--shell-line);padding-top:16px;}
+  .side-foot kbd{font-family:'JetBrains Mono',monospace;background:var(--shell-2);border:1px solid var(--shell-line);border-radius:5px;padding:1px 6px;font-size:10.5px;color:var(--shell-text);}
+
+  /* ---------- Main ---------- */
+  .main{padding:0;background:var(--page);}
+  .topbar{
+    position:sticky;top:0;z-index:30;
+    background:rgba(235,237,241,.82);
+    backdrop-filter:saturate(150%) blur(12px);
+    border-bottom:1px solid var(--line-strong);
+    padding:16px 40px;
+    display:flex;gap:16px;align-items:center;flex-wrap:wrap;
+  }
+  .search{
+    flex:1;min-width:240px;display:flex;align-items:center;gap:10px;
+    background:var(--card);border:1px solid var(--line-strong);border-radius:11px;
+    padding:10px 14px;box-shadow:var(--shadow);
+  }
+  .search svg{flex:none;color:var(--ink-faint);}
+  .search .prompt{font-family:'JetBrains Mono',monospace;color:var(--c-rag);font-size:13px;flex:none;}
+  .search input{
+    border:0;outline:0;background:transparent;flex:1;font-size:14.5px;color:var(--ink);
+    font-family:'Inter',sans-serif;
+  }
+  .search input::placeholder{color:var(--ink-faint);}
+  .search .count{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--ink-faint);white-space:nowrap;}
+
+  .controls{display:flex;gap:8px;}
+  .btn{
+    font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.02em;
+    border:1px solid var(--line-strong);background:var(--card);color:var(--ink-soft);
+    padding:9px 14px;border-radius:10px;cursor:pointer;box-shadow:var(--shadow);
+    transition:transform .12s,border-color .15s,color .15s;
+  }
+  .btn:hover{transform:translateY(-1px);border-color:var(--ink-faint);color:var(--ink);}
+  .btn:active{transform:translateY(0);}
+
+  .content{padding:34px 40px 90px;max-width:980px;margin:0 auto;}
+
+  .hero{
+    margin-bottom:38px;padding:30px 32px;border-radius:18px;
+    background:linear-gradient(135deg,#13171F,#1C2330 60%,#222A38);
+    color:#EAF0F8;position:relative;overflow:hidden;box-shadow:var(--shadow-lift);
+  }
+  .hero:before{
+    content:"";position:absolute;inset:0;opacity:.5;
+    background:
+      radial-gradient(420px 160px at 88% -10%, rgba(109,93,211,.45), transparent 70%),
+      radial-gradient(380px 150px at 10% 120%, rgba(19,162,148,.35), transparent 70%);
+  }
+  .hero .eyebrow{position:relative;font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:#9FB0C8;}
+  .hero h2{position:relative;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:30px;line-height:1.15;margin:12px 0 10px;letter-spacing:-.015em;}
+  .hero p{position:relative;margin:0;max-width:60ch;color:#C6D0DE;font-size:14.5px;}
+  .hero .stats{position:relative;display:flex;gap:26px;margin-top:20px;flex-wrap:wrap;}
+  .hero .stat{display:flex;flex-direction:column;}
+  .hero .stat b{font-family:'Space Grotesk',sans-serif;font-size:22px;color:#fff;font-weight:600;}
+  .hero .stat span{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8B9AB1;margin-top:2px;}
+
+  /* ---------- Category section ---------- */
+  .section{margin-bottom:46px;scroll-margin-top:90px;}
+  .section-head{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
+  .section-head .chip{
+    width:34px;height:34px;border-radius:10px;flex:none;
+    display:grid;place-items:center;color:#fff;font-family:'JetBrains Mono',monospace;
+    font-weight:600;font-size:14px;box-shadow:var(--shadow);
+  }
+  .section-head h3{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:21px;margin:0;letter-spacing:-.01em;}
+  .section-head .meta{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);}
+
+  /* ---------- Card ---------- */
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden;
+    transition:box-shadow .18s,border-color .18s,transform .18s;
+  }
+  .card.open{box-shadow:var(--shadow-lift);}
+  .card-spine{display:flex;}
+  .spine{width:5px;flex:none;}
+  .card-body{flex:1;min-width:0;}
+  .q-head{
+    display:flex;align-items:flex-start;gap:14px;padding:16px 18px;cursor:pointer;user-select:none;
+  }
+  .q-num{
+    font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;
+    color:#fff;background:var(--ink);border-radius:7px;padding:3px 8px;flex:none;margin-top:1px;
+    min-width:30px;text-align:center;
+  }
+  .q-text{flex:1;font-size:15.5px;font-weight:500;color:var(--ink);line-height:1.4;}
+  .q-actions{display:flex;align-items:center;gap:8px;flex:none;}
+  .review-btn{
+    width:26px;height:26px;border-radius:8px;border:1.5px solid var(--line-strong);
+    background:var(--card);cursor:pointer;display:grid;place-items:center;color:var(--ink-faint);
+    transition:all .15s;flex:none;
+  }
+  .review-btn:hover{border-color:var(--ink-faint);}
+  .card.reviewed .review-btn{background:#1FA37A;border-color:#1FA37A;color:#fff;}
+  .chev{color:var(--ink-faint);transition:transform .2s;flex:none;}
+  .card.open .chev{transform:rotate(180deg);}
+
+  .answer{
+    max-height:0;overflow:hidden;
+    transition:max-height .32s cubic-bezier(.2,.7,.3,1);
+  }
+  .answer-inner{padding:2px 18px 20px 62px;}
+  .block{margin-top:14px;}
+  .block:first-child{margin-top:4px;}
+  .block .label{
+    font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px;display:flex;align-items:center;gap:7px;
+  }
+  .block .label:before{content:"";width:14px;height:2px;border-radius:2px;background:currentColor;opacity:.5;}
+  .block.answer-block .label{color:var(--accent);}
+  .block p{margin:0;font-size:14.3px;color:var(--ink-soft);line-height:1.62;}
+  .block.answer-block p{color:var(--ink);font-weight:450;}
+  .block code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:#F2F3F6;border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:#2A3340;}
+
+  .formula{
+    margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:15px;
+    background:#12161F;color:#E6ECF5;border-radius:10px;padding:14px 18px;
+    display:flex;align-items:center;gap:12px;overflow-x:auto;
+  }
+  .formula .ftag{color:#7E8AA0;font-size:11px;letter-spacing:.1em;text-transform:uppercase;flex:none;}
+  .formula .fmath{color:#9FE7DC;}
+  .formula sup{font-size:.75em;}
+
+  .resources{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+  .res{
+    display:inline-flex;align-items:center;gap:7px;text-decoration:none;
+    font-size:12.5px;font-weight:500;color:var(--ink-soft);
+    background:var(--card);border:1px solid var(--line-strong);border-radius:9px;
+    padding:7px 11px;transition:all .15s;
+  }
+  .res:hover{border-color:var(--accent);color:var(--ink);transform:translateY(-1px);box-shadow:var(--shadow);}
+  .res .ic{width:15px;height:15px;flex:none;display:grid;place-items:center;border-radius:4px;color:#fff;font-size:9px;font-family:'JetBrains Mono',monospace;font-weight:600;}
+  .ic.youtube{background:#E0364F;}
+  .ic.blog{background:#2A72D4;}
+  .ic.repo{background:#24292F;}
+  .ic.docs{background:#13A294;}
+  .ic.paper{background:#8255C9;}
+  .res .kind{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;}
+
+  .no-results{text-align:center;padding:70px 20px;color:var(--ink-faint);}
+  .no-results .big{font-family:'Space Grotesk',sans-serif;font-size:20px;color:var(--ink-soft);margin-bottom:6px;}
+
+  mark{background:#FFE9A8;color:inherit;border-radius:3px;padding:0 1px;}
+
+  /* mobile */
+  .mobile-bar{display:none;}
+  @media (max-width:880px){
+    .layout{grid-template-columns:1fr;}
+    .sidebar{display:none;}
+    .mobile-bar{
+      display:flex;gap:8px;overflow-x:auto;padding:12px 18px;background:var(--shell);
+      position:sticky;top:0;z-index:40;border-bottom:1px solid var(--shell-line);-webkit-overflow-scrolling:touch;
+    }
+    .mobile-bar a{flex:none;text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11.5px;
+      color:var(--shell-text);background:var(--shell-2);border:1px solid var(--shell-line);
+      padding:7px 12px;border-radius:99px;display:flex;align-items:center;gap:7px;white-space:nowrap;}
+    .mobile-bar a .dot{width:8px;height:8px;border-radius:3px;}
+    .topbar{padding:12px 18px;top:50px;}
+    .content{padding:22px 18px 70px;}
+    .answer-inner{padding-left:18px;}
+    .hero{padding:24px 22px;}
+    .hero h2{font-size:24px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;scroll-behavior:auto!important;}
+  }
+  :focus-visible{outline:2.5px solid var(--c-py);outline-offset:2px;border-radius:6px;}
+</style>
+</head>
+<body>
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="tag">// field manual</span>
+      <h1>AI / ML Engineering Interview Prep</h1>
+      <span class="sub">50 questions across 5 domains — answers, the deeper "why," and a curated resource for the ones worth mastering.</span>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-meta"><span>Reviewed</span><b><span id="rev-count">0</span> / 50</b></div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+
+    <nav class="nav" id="nav">
+      <div class="nav-label">Domains</div>
+      <!-- injected -->
+    </nav>
+
+    <div class="side-foot">
+      Click any question to expand. Press <kbd>/</kbd> to search, <kbd>Esc</kbd> to clear. Your reviewed marks are saved in this browser.
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="mobile-bar" id="mobile-bar"></div>
+
+    <div class="topbar">
+      <label class="search">
+        <span class="prompt">grep&nbsp;»</span>
+        <input id="search" type="text" placeholder="Filter questions — e.g. attention, drift, embeddings, asyncio…" aria-label="Search questions" />
+        <span class="count" id="result-count">50 shown</span>
+      </label>
+      <div class="controls">
+        <button class="btn" id="toggle-all">Expand all</button>
+        <button class="btn" id="reset-review" title="Clear reviewed marks">Reset ✓</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <section class="hero">
+        <span class="eyebrow">// from 5 screenshots → one study console</span>
+        <h2>Walk in ready for the LLM / ML systems loop.</h2>
+        <p>Every question below carries three things: the crisp answer you'd actually say in the room, the deeper mechanism so you can defend it under follow-ups, and — where the topic rewards real depth — a hand-picked video, blog, or repo to go build the intuition.</p>
+        <div class="stats">
+          <div class="stat"><b>50</b><span>questions</span></div>
+          <div class="stat"><b>5</b><span>domains</span></div>
+          <div class="stat"><b>40+</b><span>resources</span></div>
+          <div class="stat"><b>2</b><span>formulas</span></div>
+        </div>
+      </section>
+
+      <div id="sections"><!-- injected --></div>
+
+      <div class="no-results" id="no-results" style="display:none;">
+        <div class="big">No questions match that filter.</div>
+        <div>Try a broader term, or clear the search with Esc.</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* ============================================================
+   CONTENT — all 50 questions, answers, deeper notes, resources
+   ============================================================ */
+const DATA = [
+  {
+    id:"llm", title:"LLM Systems", short:"LLM", accent:"var(--c-llm)", hex:"#6D5DD3",
+    questions:[
+      {
+        q:"How would you design a scalable AI chatbot architecture?",
+        answer:"Put a stateless API gateway in front of horizontally-scalable inference workers, with a queue or load balancer routing requests by model and priority. Keep conversation state in a fast store (Redis), serve the model behind an optimized runtime (vLLM/TGI) with continuous batching, and add a semantic cache, retrieval layer, and observability around it.",
+        deeper:"The core scaling unit is the GPU worker — everything else exists to keep it busy and protected. Decouple ingestion from inference with a queue so traffic spikes don't drop requests, use continuous (in-flight) batching to push GPU utilization, and separate 'fast path' (cached/cheap) from 'slow path' (full generation) so most requests never hit a GPU. Statelessness lets you autoscale workers; session state lives outside them.",
+        resources:[
+          {label:"Designing ML Systems (Chip Huyen)", url:"https://huyenchip.com/2023/04/11/llm-engineering.html", kind:"blog"},
+          {label:"vLLM — continuous batching", url:"https://docs.vllm.ai/en/latest/", kind:"docs"}
+        ]
+      },
+      {
+        q:"How would you reduce latency in an LLM application?",
+        answer:"Attack it on three axes: model (quantization, smaller/distilled models, speculative decoding), serving (continuous batching, KV-cache reuse, paged attention, GPU co-location), and product (streaming tokens so time-to-first-token feels instant, prompt caching, and skipping the model entirely via semantic cache for repeat queries).",
+        deeper:"Distinguish time-to-first-token (TTFT) from inter-token latency — users feel TTFT most, so streaming is the highest-leverage UX fix. KV-cache reuse and prefix/prompt caching avoid recomputing shared context. Speculative decoding uses a small draft model to propose tokens a big model verifies in parallel, cutting wall-clock time without quality loss.",
+        resources:[
+          {label:"Efficient LLM inference (Lilian Weng)", url:"https://lilianweng.github.io/posts/2023-01-10-inference-optimization/", kind:"blog"}
+        ]
+      },
+      {
+        q:"How would you handle rate limits for millions of users?",
+        answer:"Enforce limits at the edge with a token-bucket or sliding-window algorithm backed by Redis, keyed per user/API-key/tier. Combine quotas (requests + tokens) with a request queue and graceful 429s carrying Retry-After, and shed or degrade load (smaller model, cached answer) before the system saturates.",
+        deeper:"For LLMs you rate-limit on tokens, not just requests, because cost and GPU time scale with sequence length. A distributed token bucket in Redis gives O(1) checks across many app servers. Add fairness so one heavy tenant can't starve others, and back-pressure upstream so the queue never grows unbounded.",
+        resources:[
+          {label:"System Design: Rate Limiter", url:"https://www.youtube.com/results?search_query=rate+limiter+system+design", kind:"youtube"}
+        ]
+      },
+      {
+        q:"How would you cache LLM responses efficiently?",
+        answer:"Use two layers: an exact-match cache keyed by a hash of (prompt + params) for identical calls, and a semantic cache that embeds the query and returns a stored answer when cosine similarity to a past query exceeds a threshold. Add prompt/prefix caching at the serving layer to reuse KV state for shared system prompts.",
+        deeper:"Semantic caching trades a small recall risk for big cost savings — tune the similarity threshold carefully, because too low returns wrong answers. Cache invalidation matters when answers depend on changing data (RAG), so scope TTLs to freshness needs. Prefix caching is different: it caches computation (KV cache), not outputs.",
+        resources:[
+          {label:"GPTCache (semantic cache repo)", url:"https://github.com/zilliztech/GPTCache", kind:"repo"}
+        ]
+      },
+      {
+        q:"How would you manage conversation memory in chatbots?",
+        answer:"Keep a rolling window of recent turns within the context budget, and for long sessions summarize older turns into a compact running summary. For durable memory, store facts in a vector DB and retrieve only the relevant ones per turn, rather than stuffing the whole history into the prompt.",
+        deeper:"Context windows are finite and cost scales with length, so 'remember everything' isn't viable. The standard toolkit is: buffer (last N turns), summary memory (LLM-compressed history), and retrieval memory (semantic search over past facts). Production systems blend all three — recent turns verbatim, older context summarized, long-term facts retrieved on demand.",
+        resources:[
+          {label:"LangChain — memory types", url:"https://python.langchain.com/docs/concepts/chat_history/", kind:"docs"}
+        ]
+      },
+      {
+        q:"How would you monitor hallucinations in production?",
+        answer:"Combine automated checks with sampling: groundedness/faithfulness scoring (does the answer follow from the retrieved context?), an LLM-as-judge or NLI model to flag unsupported claims, plus user signals (thumbs-down, regenerations) and a human-reviewed sample. Log inputs, retrieved context, and outputs so every flagged case is reproducible.",
+        deeper:"In RAG, hallucination is often a retrieval failure, so monitor groundedness against the retrieved chunks, not abstract 'truth.' Track it as a rate over time and segment by topic to catch drift. LLM-as-judge is cheap and scalable but biased, so calibrate it against human labels periodically.",
+        resources:[
+          {label:"RAGAS — faithfulness metrics", url:"https://docs.ragas.io/", kind:"docs"},
+          {label:"Survey of LLM hallucination", url:"https://arxiv.org/abs/2311.05232", kind:"paper"}
+        ]
+      },
+      {
+        q:"How would you evaluate LLM output quality automatically?",
+        answer:"Use a layered eval: reference-based metrics where you have ground truth, LLM-as-judge for open-ended quality (helpfulness, correctness, tone) with a fixed rubric, and task-specific checks (JSON validity, regex, unit tests for code). Run these on a versioned eval set in CI so every prompt or model change is regression-tested.",
+        deeper:"Traditional metrics like BLEU/ROUGE correlate poorly with quality for generative tasks, which is why LLM-as-judge dominates — but pin the judge model and prompt for reproducibility, and watch for position/verbosity bias. The biggest win is treating evals like tests: a golden dataset, scored automatically, gated in CI.",
+        resources:[
+          {label:"Your AI product needs evals (Hamel Husain)", url:"https://hamel.dev/blog/posts/evals/", kind:"blog"}
+        ]
+      },
+      {
+        q:"How would you design a multi-agent AI system?",
+        answer:"Decompose the task into specialized agents (planner, researcher, coder, critic) coordinated by an orchestrator, each with scoped tools and a clear interface. Use a shared state/blackboard for communication, add a verifier/critic loop, and bound iterations and tool calls to prevent runaway cost and loops.",
+        deeper:"The hard parts are coordination and error compounding — one bad step poisons downstream agents. Patterns that help: a supervisor/router that delegates, role specialization to keep prompts focused, and a critic that reviews before acting. Prefer the simplest topology that works; many 'multi-agent' problems are solved better by one agent with good tools.",
+        resources:[
+          {label:"Building effective agents (Anthropic)", url:"https://www.anthropic.com/research/building-effective-agents", kind:"blog"}
+        ]
+      },
+      {
+        q:"How would you handle prompt injection attacks?",
+        answer:"Treat all retrieved/user content as untrusted: separate the trusted system prompt from untrusted data, constrain the model's tools and permissions (least privilege), and validate/scope every tool action. Add input/output filtering, never let model output directly trigger high-impact actions without a guardrail or human check.",
+        deeper:"Prompt injection is unsolved at the model level — you can't fully 'prompt your way out,' so defense is architectural. The dangerous case is indirect injection, where malicious instructions hide in fetched web pages or documents. Mitigate by sandboxing tools, requiring confirmation for sensitive actions, and assuming the model can be manipulated.",
+        resources:[
+          {label:"OWASP Top 10 for LLM Apps", url:"https://owasp.org/www-project-top-10-for-large-language-model-applications/", kind:"docs"},
+          {label:"Simon Willison on prompt injection", url:"https://simonwillison.net/series/prompt-injection/", kind:"blog"}
+        ]
+      },
+      {
+        q:"How would you deploy an open-source LLM securely?",
+        answer:"Serve it behind an authenticated API in a private network (no public model endpoint), run inference in isolated containers with no outbound access it doesn't need, and put auth, rate limiting, input/output filtering, and audit logging at the gateway. Pin model weights from a trusted source and scan the serving stack for CVEs.",
+        deeper:"Security spans the supply chain (verify weights, avoid untrusted pickle files), the runtime (sandbox, resource limits, no secrets in prompts), and the data path (PII handling, logging hygiene). Self-hosting wins on data control but you now own patching, isolation, and abuse prevention that a managed API handled for you.",
+        resources:[
+          {label:"vLLM / TGI production serving", url:"https://github.com/huggingface/text-generation-inference", kind:"repo"}
+        ]
+      }
+    ]
+  },
+
+  {
+    id:"rag", title:"RAG & Vector Databases", short:"RAG", accent:"var(--c-rag)", hex:"#13A294",
+    questions:[
+      {
+        q:"Why is chunking important in RAG systems?",
+        answer:"Chunking controls what the retriever can actually find and what the model gets to read. Too-large chunks dilute the embedding and blow the context budget, too-small chunks lose the surrounding meaning. Good chunking aligns retrievable units with semantically coherent pieces of information, which directly drives retrieval precision.",
+        deeper:"An embedding is one vector summarizing the whole chunk, so a chunk mixing several topics produces a muddy vector that matches nothing well. Chunking also determines grounding granularity for citations. Strategies range from fixed-size with overlap to structure-aware (by heading/section) and semantic chunking that splits on topic shifts.",
+        resources:[
+          {label:"Chunking strategies (Pinecone)", url:"https://www.pinecone.io/learn/chunking-strategies/", kind:"blog"}
+        ]
+      },
+      {
+        q:"How do you choose chunk size for documents?",
+        answer:"Match chunk size to the natural information unit of the content and the embedding model's optimal input length — typically a few hundred tokens with 10–20% overlap as a starting point. Tune empirically against a retrieval eval set: measure recall/precision as you vary size, since the right value depends on document structure and query type.",
+        deeper:"Dense, factual docs favor smaller chunks for precise retrieval; narrative or contextual content favors larger chunks so meaning survives. Overlap prevents answers from being split across a boundary. The honest answer in an interview is 'I'd benchmark it' — there's no universal number, and structure-aware splitting often beats any fixed size.",
+        resources:[]
+      },
+      {
+        q:"Difference between sparse and dense retrieval",
+        answer:"Sparse retrieval (BM25/TF-IDF) matches on exact terms using a high-dimensional, mostly-zero vector — great for keywords, names, and rare tokens. Dense retrieval uses learned embeddings to match on meaning, catching paraphrases and synonyms. Hybrid retrieval fuses both to get exact-match precision plus semantic recall.",
+        deeper:"Sparse fails when wording differs ('car' vs 'automobile'); dense fails on exact identifiers, codes, or rare jargon it never learned. That complementarity is why production systems run both and combine scores (e.g. reciprocal rank fusion). Sparse needs no training and is interpretable; dense needs a good embedding model but generalizes semantically.",
+        resources:[
+          {label:"Hybrid search explained (Weaviate)", url:"https://weaviate.io/blog/hybrid-search-explained", kind:"blog"}
+        ]
+      },
+      {
+        q:"What causes poor retrieval quality in RAG pipelines?",
+        answer:"Common culprits: bad chunking, an embedding model mismatched to the domain, a query phrased differently than the documents, missing hybrid/keyword matching, no reranking, and a stale or poorly-filtered index. Often the generation looks wrong but the real failure is upstream in retrieval.",
+        deeper:"Diagnose by separating retrieval from generation: check whether the right chunk was even in the top-k before blaming the LLM. Query–document mismatch is huge — techniques like query rewriting, HyDE (hypothetical document embeddings), and multi-query help. Metadata filtering errors and embedding drift after a model upgrade are sneaky causes.",
+        resources:[
+          {label:"Advanced RAG techniques", url:"https://www.pinecone.io/learn/advanced-rag-techniques/", kind:"blog"}
+        ]
+      },
+      {
+        q:"How do embeddings work internally?",
+        answer:"An embedding model maps text to a fixed-length vector in a space where semantically similar inputs land close together. A transformer encodes the tokens with attention, then a pooling step (CLS token or mean pooling) collapses them to one vector. The model is trained with contrastive objectives so related pairs are pulled together and unrelated ones pushed apart.",
+        deeper:"The geometry is the whole point: 'distance = dissimilarity.' Contrastive training (e.g. on query–positive–negative triples) shapes that space. Dimensions aren't individually interpretable — meaning lives in directions and relative positions. For retrieval, vectors are usually L2-normalized so cosine similarity reduces to a dot product.",
+        resources:[
+          {label:"The Illustrated Word2Vec (Jay Alammar)", url:"https://jalammar.github.io/illustrated-word2vec/", kind:"blog"},
+          {label:"Sentence embeddings (HF course)", url:"https://huggingface.co/learn", kind:"docs"}
+        ]
+      },
+      {
+        q:"How would you improve semantic search accuracy?",
+        answer:"Layer improvements: use a stronger/domain-tuned embedding model, add hybrid (dense + sparse) retrieval, apply a cross-encoder reranker on the top candidates, and rewrite or expand queries. Clean chunking and metadata filtering, plus fine-tuning embeddings on your own query–document pairs, push it further.",
+        deeper:"The highest-leverage cheap win is usually a reranker: retrieve a broad top-50 with fast bi-encoders, then rerank to top-5 with a slow but accurate cross-encoder. Query rewriting fixes the user–document vocabulary gap. Fine-tuning the embedding model on in-domain pairs beats any prompt trick when you have labeled data.",
+        resources:[
+          {label:"Rerankers & 2-stage retrieval (Pinecone)", url:"https://www.pinecone.io/learn/series/rag/rerankers/", kind:"blog"}
+        ]
+      },
+      {
+        q:"Why do vector databases use similarity search?",
+        answer:"Because meaning is encoded as proximity in embedding space, 'find relevant' becomes 'find nearest vectors.' Exact nearest-neighbor over millions of vectors is too slow, so vector DBs use Approximate Nearest Neighbor (ANN) indexes like HNSW to get sub-linear search with a tunable accuracy/speed trade-off.",
+        deeper:"Brute-force kNN is O(N·d) per query — fine for thousands, hopeless for billions. ANN structures (HNSW graphs, IVF, PQ) trade a little recall for massive speedups. HNSW builds a navigable multi-layer graph you greedily traverse; the ef/M parameters tune recall vs latency. This is the core engineering reason vector DBs exist as a category.",
+        resources:[
+          {label:"HNSW & ANN indexes (Pinecone)", url:"https://www.pinecone.io/learn/series/faiss/hnsw/", kind:"blog"}
+        ]
+      },
+      {
+        q:"Difference between cosine similarity and Euclidean distance",
+        answer:"Cosine similarity measures the angle between vectors (direction/orientation), ignoring magnitude, so it's robust to length differences — ideal for text embeddings. Euclidean distance measures straight-line distance, which is sensitive to magnitude. On L2-normalized vectors the two are monotonically related, so they rank results identically.",
+        deeper:"For embeddings, what carries meaning is direction, not vector length, which is why cosine dominates NLP retrieval. After normalization, cosine similarity = dot product, and minimizing Euclidean distance is equivalent to maximizing cosine — that's why many indexes normalize then use inner product. Choose Euclidean when magnitude is meaningful (e.g. some image features).",
+        formula:{tag:"cosine", math:'cos(θ) = (A · B) / (‖A‖ · ‖B‖)'},
+        resources:[
+          {label:"StatQuest — Cosine similarity", url:"https://www.youtube.com/@statquest", kind:"youtube"}
+        ]
+      },
+      {
+        q:"How would you evaluate retrieval performance?",
+        answer:"Use ranking-aware IR metrics on a labeled query set: recall@k and precision@k for coverage, plus MRR and nDCG to reward putting the right chunk near the top. For end-to-end RAG, add context-relevance and faithfulness scores so you measure both 'did we retrieve the right thing' and 'did the answer use it.'",
+        deeper:"Retrieval and generation must be evaluated separately or you can't localize failures. Recall@k tells you if the answer is even reachable; nDCG accounts for ranking quality with graded relevance. Tools like RAGAS automate context-precision/recall and faithfulness, but a hand-labeled golden set is still the ground truth.",
+        resources:[
+          {label:"RAGAS metrics", url:"https://docs.ragas.io/", kind:"docs"}
+        ]
+      },
+      {
+        q:"What are rerankers and why are they used?",
+        answer:"A reranker is a model — usually a cross-encoder — that re-scores an initial candidate list for true relevance to the query. The first stage retrieves fast but coarsely (bi-encoders/ANN); the reranker reads each query–document pair jointly to produce a far more accurate ordering, dramatically improving the final top-k.",
+        deeper:"Bi-encoders embed query and document independently, so they miss fine interactions; cross-encoders attend over both together, which is accurate but too slow to run over the whole corpus. The two-stage pattern — retrieve top-50 cheaply, rerank to top-5 expensively — is the standard accuracy lever in modern RAG.",
+        resources:[
+          {label:"Cross-encoders vs bi-encoders (Sentence-Transformers)", url:"https://www.sbert.net/examples/applications/cross-encoder/README.html", kind:"docs"}
+        ]
+      }
+    ]
+  },
+
+  {
+    id:"mlops", title:"MLOps & Deployment", short:"MLOps", accent:"var(--c-mlops)", hex:"#DD7C20",
+    questions:[
+      {
+        q:"How would you deploy an ML model into production?",
+        answer:"Package the model and its preprocessing behind a versioned, containerized service with a clear API, deployed via CI/CD with automated tests and a registry. Roll out gradually (canary or shadow), monitor predictions and latency, and keep the previous version ready for instant rollback.",
+        deeper:"The model artifact is only part of the contract — the feature transforms must match training exactly, or you get training-serving skew. A model registry gives you versioning, lineage, and reproducibility. Prefer progressive delivery (shadow → canary → full) so a bad model is caught on a slice of traffic, not all of it.",
+        resources:[
+          {label:"MLOps: CD & automation (Google Cloud)", url:"https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning", kind:"blog"}
+        ]
+      },
+      {
+        q:"What is model drift and how do you detect it?",
+        answer:"Drift is when the live data or the input–output relationship diverges from what the model was trained on, degrading accuracy. Detect it by monitoring input feature distributions (data drift) and the target relationship (concept drift) with statistical tests, plus tracking live performance metrics when labels eventually arrive.",
+        deeper:"Two kinds matter: data drift (P(X) shifts) and concept drift (P(Y|X) shifts). Since ground-truth labels often lag, you watch proxies — feature distribution shifts via PSI/KL-divergence or KS tests, and prediction distribution changes. Set alerts on drift magnitude and trigger retraining or investigation, not silent decay.",
+        resources:[
+          {label:"Evidently AI — drift detection", url:"https://github.com/evidentlyai/evidently", kind:"repo"}
+        ]
+      },
+      {
+        q:"Difference between CI/CD and CT pipelines in ML",
+        answer:"CI/CD ships code: integrate, test, and deploy the application and pipeline reliably. CT — Continuous Training — adds an automated loop that retrains, validates, and redeploys the model when new data arrives or drift is detected. ML needs CT because the model degrades over time even when the code never changes.",
+        deeper:"In classic software, behavior changes only when code changes. In ML, behavior also changes as the world's data shifts, so you automate retraining as a first-class pipeline with its own validation gates (data checks, model-quality thresholds) before promotion. CI tests code and data; CD deploys; CT keeps the model fresh.",
+        resources:[
+          {label:"MLOps levels (Google Cloud)", url:"https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning", kind:"blog"}
+        ]
+      },
+      {
+        q:"How would you version datasets and models?",
+        answer:"Version models in a model registry with metadata (training data ref, hyperparameters, metrics, git commit) and immutable artifact storage. Version datasets with content-addressable tooling like DVC or lakeFS that tracks data by hash and links it to the code/model that produced it, so any result is fully reproducible.",
+        deeper:"Reproducibility means pinning the triple (code, data, config) that produced a model. Git handles code but is wrong for large binaries, so DVC/lakeFS store pointers in git and data in object storage. Tag every model with the exact dataset version and run params — without this, you can't debug regressions or satisfy audits.",
+        resources:[
+          {label:"DVC — data version control", url:"https://github.com/iterative/dvc", kind:"repo"}
+        ]
+      },
+      {
+        q:"What metrics would you monitor in production?",
+        answer:"Three tiers: operational (latency, throughput, error rate, GPU/CPU utilization, cost), data/model health (input drift, prediction distribution, missing features), and business/quality (accuracy when labels arrive, downstream KPIs). Tie alerts to the ones that signal real degradation, not just noise.",
+        deeper:"Pure system metrics miss silent model failure — a model can be fast and 100% available while quietly becoming wrong. So you pair infra monitoring with ML-specific monitoring (drift, calibration, segment-level performance). Watch slices, not just averages, because aggregate accuracy can hide a broken subgroup.",
+        resources:[
+          {label:"Monitoring ML in production (Chip Huyen)", url:"https://huyenchip.com/2022/02/07/data-distribution-shifts-and-monitoring.html", kind:"blog"}
+        ]
+      },
+      {
+        q:"How would you roll back a bad model deployment?",
+        answer:"Keep the previous model version live in the registry and behind a routing layer, so rollback is a config/traffic switch, not a rebuild. Detect the problem fast via canary metrics and automated guardrails, flip traffic back to the known-good version, then investigate offline.",
+        deeper:"Fast rollback depends on choices made before deploy: immutable versioned artifacts, blue-green or canary routing, and automated quality gates that can trip a rollback without a human. Treat the model like any other deploy — the ability to revert in seconds is a design requirement, not an afterthought.",
+        resources:[]
+      },
+      {
+        q:"Difference between online and batch inference",
+        answer:"Online (real-time) inference serves predictions per request with low latency — needed for interactive features. Batch inference scores large datasets on a schedule, optimizing for throughput and cost rather than latency. The choice is driven by whether predictions are needed instantly or can be precomputed.",
+        deeper:"Batch is simpler and cheaper: no tight SLAs, easy to parallelize, results stored for lookup. Online demands always-on serving, autoscaling, and latency budgets. Many systems are hybrid — precompute heavy features or candidate sets in batch, then do light real-time scoring on top.",
+        resources:[]
+      },
+      {
+        q:"How would you scale GPU inference servers?",
+        answer:"Scale horizontally behind a load balancer with autoscaling on GPU utilization/queue depth, and maximize per-GPU throughput first via batching, optimized runtimes (vLLM/TensorRT), quantization, and KV-cache reuse. Route by model, and use techniques like multi-instance GPU or model sharding when a single GPU isn't enough.",
+        deeper:"GPUs are expensive and bursty, so efficiency per GPU matters more than raw replica count — continuous batching can multiply throughput severalfold. Autoscale on the right signal (queue length, not just CPU). For very large models you shard across GPUs (tensor/pipeline parallelism); for many small ones you pack multiple per GPU.",
+        resources:[
+          {label:"vLLM throughput internals", url:"https://docs.vllm.ai/en/latest/", kind:"docs"}
+        ]
+      },
+      {
+        q:"What causes training-serving skew?",
+        answer:"It's any difference between how features are computed at training vs serving time: different code paths, different data sources, time-travel/leakage, or version mismatches in preprocessing. The model then sees inputs at serving that don't match what it learned, silently hurting accuracy.",
+        deeper:"Classic causes are duplicating feature logic in two codebases (and one drifts), aggregations computed over different windows, and label leakage where a training feature isn't available at inference. The fix is sharing one feature transformation path — a feature store or a single preprocessing module used by both training and serving.",
+        resources:[
+          {label:"Rules of ML (Google)", url:"https://developers.google.com/machine-learning/guides/rules-of-ml", kind:"docs"}
+        ]
+      },
+      {
+        q:"How would you optimize inference costs?",
+        answer:"Right-size the model (distillation, quantization, smaller variants), raise utilization with batching and autoscaling-to-zero for spiky loads, cache repeat results, and route easy queries to cheaper models. Pick hardware to match the workload and use spot/committed capacity where availability allows.",
+        deeper:"Cost ≈ (GPU-hours) × (price) ÷ (useful requests served), so the levers are fewer/cheaper GPU-hours and more requests per GPU. Cascading (cheap model first, escalate only hard cases), semantic caching, and quantization are the biggest wins. Measure cost-per-request as a first-class metric, the way you measure latency.",
+        resources:[]
+      }
+    ]
+  },
+
+  {
+    id:"dl", title:"Deep Learning", short:"DL", accent:"var(--c-dl)", hex:"#D43F66",
+    questions:[
+      {
+        q:"Why do Transformers scale better than RNNs?",
+        answer:"Transformers process a whole sequence in parallel via self-attention, while RNNs are inherently sequential — each step waits for the previous one. Parallelism maps far better onto GPUs, and attention gives every token a direct path to every other token, avoiding the long-range gradient problems that plague RNNs.",
+        deeper:"Two wins: hardware and modeling. Computationally, attention removes the sequential dependency so you can fully utilize parallel hardware during training. Statistically, the constant path length between any two positions means long-range dependencies don't decay through many recurrent steps, so gradients stay healthy and context is preserved.",
+        resources:[
+          {label:"The Illustrated Transformer (Jay Alammar)", url:"https://jalammar.github.io/illustrated-transformer/", kind:"blog"},
+          {label:"Let's build GPT (Karpathy)", url:"https://www.youtube.com/watch?v=kCc8FmEb1nY", kind:"youtube"}
+        ]
+      },
+      {
+        q:"Explain attention complexity mathematically",
+        answer:"Self-attention computes pairwise scores between all tokens, so for a sequence of length n the attention matrix is n×n, giving O(n²·d) time and O(n²) memory. That quadratic cost in sequence length is the main bottleneck for long contexts, motivating efficient variants like FlashAttention and sparse/linear attention.",
+        deeper:"Q·Kᵀ produces an n×n matrix (every token attends to every token), then softmax and multiplication by V. The d term is the head dimension. FlashAttention doesn't reduce the O(n²) FLOPs but avoids materializing the full matrix in HBM, cutting memory I/O; linear/sparse attention approximates it to break the quadratic scaling.",
+        formula:{tag:"complexity", math:'Attention = O(n² · d)'},
+        resources:[
+          {label:"Attention, visually (3Blue1Brown)", url:"https://www.youtube.com/watch?v=eMlx5fFNoYc", kind:"youtube"}
+        ]
+      },
+      {
+        q:"Why do larger batch sizes affect generalization?",
+        answer:"Very large batches give a low-variance gradient estimate that tends to converge to sharp minima, which often generalize worse than the flatter minima found by the noisier gradients of small batches. To recover accuracy at large batch sizes you usually must scale the learning rate and add warmup.",
+        deeper:"Small-batch gradient noise acts as implicit regularization, nudging optimization toward flat, robust minima. The well-known fix (linear LR scaling + warmup) lets large batches train fast without a generalization gap, up to a point. The effect is empirical and debated, but the sharp-vs-flat-minima view is the standard interview framing.",
+        resources:[
+          {label:"On large-batch training (Keskar et al.)", url:"https://arxiv.org/abs/1609.04836", kind:"paper"}
+        ]
+      },
+      {
+        q:"Explain residual connections mathematically",
+        answer:"A residual block computes y = F(x) + x: the layer learns a residual function F added back to its input via a skip connection. This makes the identity mapping trivial to represent and lets gradients flow directly through the +x path, which is what enables training of very deep networks.",
+        deeper:"By backprop, ∂y/∂x = F′(x) + 1 — that +1 means gradients have an unobstructed highway backward, preventing them from vanishing through many layers. It also reframes learning as 'adjust the input a little' rather than 'transform from scratch,' which is easier to optimize. Residuals are why 100+ layer networks and transformers train at all.",
+        formula:{tag:"residual", math:'y = F(x) + x'},
+        resources:[
+          {label:"Deep Residual Learning (ResNet paper)", url:"https://arxiv.org/abs/1512.03385", kind:"paper"}
+        ]
+      },
+      {
+        q:"What is gradient accumulation?",
+        answer:"Gradient accumulation runs several forward/backward passes on small micro-batches, summing their gradients, and only steps the optimizer after N of them — simulating a large effective batch without the memory cost. It's the standard trick for training big models on limited GPU memory.",
+        deeper:"Effective batch size = micro-batch × accumulation steps × number of devices. You don't call optimizer.step() each micro-batch; you accumulate grads, then step and zero them. Remember to scale/average the loss correctly so the gradient magnitude matches a true large batch. It trades wall-clock time for memory.",
+        resources:[
+          {label:"HF — gradient accumulation", url:"https://huggingface.co/docs/transformers/perf_train_gpu_one", kind:"docs"}
+        ]
+      },
+      {
+        q:"Why does mixed precision training improve speed?",
+        answer:"Mixed precision does most math in 16-bit (FP16/BF16) instead of 32-bit, which halves memory and lets GPUs use specialized Tensor Cores for much higher throughput. A few numerically sensitive parts stay in FP32, and loss scaling prevents small gradients from underflowing.",
+        deeper:"Lower precision means more values per memory bandwidth and faster matrix multiplies on hardware built for it, often a 2–3× speedup with larger batches. The risk is FP16's narrow range causing underflow/overflow, handled by keeping master weights in FP32 and dynamic loss scaling. BF16 has a wider range and often skips loss scaling.",
+        resources:[
+          {label:"Mixed precision (NVIDIA docs)", url:"https://docs.nvidia.com/deeplearning/performance/mixed-precision-training/index.html", kind:"docs"}
+        ]
+      },
+      {
+        q:"What causes catastrophic forgetting?",
+        answer:"When a network is trained on new data, gradient updates overwrite the weights that encoded earlier tasks, because the same parameters are shared and nothing protects old knowledge. The model fits the new distribution and loses performance on the old one.",
+        deeper:"It's a consequence of distributed representations plus sequential training: weights important for task A get freely repurposed for task B. Mitigations include rehearsal (mixing in old data), regularization that penalizes changing important weights (EWC), and parameter-isolation/adapter methods that add new capacity instead of overwriting.",
+        resources:[
+          {label:"Overcoming catastrophic forgetting (EWC)", url:"https://arxiv.org/abs/1612.00796", kind:"paper"}
+        ]
+      },
+      {
+        q:"Difference between fine-tuning and transfer learning",
+        answer:"Transfer learning is the broad idea of reusing a pretrained model's learned representations for a new task. Fine-tuning is one way to do it — continuing training and updating the pretrained weights on new data. You can also transfer by freezing the backbone and training only a new head, or via lightweight adapters/LoRA.",
+        deeper:"Think of transfer learning as the umbrella and fine-tuning as the most thorough technique under it. Feature extraction (freeze backbone, train head) is cheap and safe with little data; full fine-tuning adapts more but risks forgetting and overfitting; parameter-efficient methods like LoRA update a tiny fraction of weights to get most of the benefit cheaply.",
+        resources:[
+          {label:"Fine-tuning vs feature extraction (Sebastian Raschka)", url:"https://magazine.sebastianraschka.com/p/finetuning-large-language-models", kind:"blog"}
+        ]
+      },
+      {
+        q:"Why do larger models show emergent abilities?",
+        answer:"As scale (parameters, data, compute) grows, some capabilities appear abruptly rather than improving smoothly — a model goes from near-random to competent on a task past a threshold. The leading explanations are that scale unlocks representational capacity and that abrupt-looking jumps partly reflect the discrete metrics used to measure them.",
+        deeper:"The phenomenon is real but contested: some 'emergence' is an artifact of harsh metrics (exact-match) and looks smooth under continuous metrics. Either way, scaling laws show predictable loss improvements, and bigger models develop richer internal features and in-context learning. In an interview, note both the scaling-law view and the metric-artifact critique.",
+        resources:[
+          {label:"Emergent Abilities of LLMs (Wei et al.)", url:"https://arxiv.org/abs/2206.07682", kind:"paper"}
+        ]
+      },
+      {
+        q:"How would you debug unstable training loss?",
+        answer:"Work down a checklist: lower or warm up the learning rate, check for bad data/NaNs and exploding gradients (add clipping), verify normalization and weight init, and confirm mixed-precision loss scaling. Overfit a single batch first to prove the pipeline can learn, then scale up.",
+        deeper:"Loss spikes or NaNs usually trace to too-high LR, numerical overflow (especially FP16), or corrupted/unshuffled data. Gradient clipping tames explosions; LR warmup stabilizes early steps; checking gradient norms and activation statistics localizes the layer at fault. The 'overfit one batch' sanity check is the single most useful first move.",
+        resources:[
+          {label:"A Recipe for Training NNs (Karpathy)", url:"https://karpathy.github.io/2019/04/25/recipe/", kind:"blog"}
+        ]
+      }
+    ]
+  },
+
+  {
+    id:"py", title:"Python / Backend", short:"Backend", accent:"var(--c-py)", hex:"#2A72D4",
+    questions:[
+      {
+        q:"How would you build a scalable FastAPI backend for AI inference?",
+        answer:"Use async endpoints to handle many concurrent I/O-bound requests, offload CPU/GPU-heavy inference to a dedicated worker pool or model server (so you never block the event loop), and run multiple Uvicorn/Gunicorn workers behind a load balancer. Add batching, streaming responses, timeouts, and health checks for production readiness.",
+        deeper:"The key insight: FastAPI's async shines for I/O concurrency, but a blocking model call inside an async route stalls the whole event loop. So route heavy inference to a separate process/GPU server (or run_in_executor), and keep the web layer thin. Scale web workers by core count; scale inference independently by GPU.",
+        resources:[
+          {label:"FastAPI docs", url:"https://fastapi.tiangolo.com/", kind:"docs"}
+        ]
+      },
+      {
+        q:"Difference between synchronous and asynchronous APIs",
+        answer:"A synchronous call blocks the caller until it finishes; an asynchronous one returns control immediately and resumes when the work completes, letting a single thread make progress on many tasks. Async excels at I/O-bound concurrency (network, DB, model APIs) by overlapping waits instead of stacking them.",
+        deeper:"Sync simplicity is fine until you're waiting on I/O — then threads sit idle. Async uses an event loop and cooperative scheduling (await) to interleave thousands of in-flight waits on one thread. It does not speed up CPU-bound work; for that you need multiple processes. Mixing a blocking call into async code silently kills the concurrency.",
+        resources:[
+          {label:"Async IO in Python (Real Python)", url:"https://realpython.com/async-io-python/", kind:"blog"}
+        ]
+      },
+      {
+        q:"How would you handle concurrent inference requests?",
+        answer:"Use async to accept many requests, then funnel them into a batched inference queue so the GPU processes several at once instead of one-by-one. Bound concurrency with a semaphore/queue to avoid OOM, and run inference in a worker pool or dedicated server decoupled from the web layer.",
+        deeper:"Dynamic batching is the big lever — collect requests for a few milliseconds, run them as one GPU batch, then scatter results back. This multiplies throughput at a tiny latency cost. Back-pressure (a bounded queue returning 429 when full) protects against overload, and decoupling web from inference lets each scale on its own bottleneck.",
+        resources:[]
+      },
+      {
+        q:"What causes memory bottlenecks in Python AI systems?",
+        answer:"Common causes: loading large models/datasets fully into RAM, accumulating tensors or references that aren't freed, the GIL forcing multiprocessing (which duplicates memory across processes), framework caching, and unbounded request queues holding large payloads. GPU OOM from too-large batches is the AI-specific classic.",
+        deeper:"Watch for held references that block garbage collection (e.g. keeping every batch's outputs in a list), copy-on-write breakage when forking with large objects, and memory fragmentation. For GPUs, the budget is model weights + activations + KV cache + batch — reduce via smaller batches, gradient checkpointing, quantization, and freeing intermediates. Profile with tracemalloc / memory_profiler.",
+        resources:[]
+      },
+      {
+        q:"How would you optimize API throughput?",
+        answer:"Maximize concurrency (async I/O, enough workers), batch inference calls, cache repeat results, and remove serialization/CPU hotspots in the request path. Profile to find the real bottleneck, then scale that — often it's blocking calls in async code or an under-batched GPU.",
+        deeper:"Throughput = concurrency × work-per-unit-time, so you raise both: more in-flight requests and more useful work per GPU pass (batching). Avoid premature horizontal scaling before fixing the obvious blockers — a single blocking DB call or unbatched model can cap throughput regardless of replica count. Measure p50/p99 latency alongside throughput so you don't trade tail latency away.",
+        resources:[]
+      },
+      {
+        q:"What are worker processes and thread pools?",
+        answer:"Worker processes are separate OS processes (each with its own Python interpreter and memory) used to achieve true parallelism past the GIL — ideal for CPU-bound work. A thread pool reuses a set of threads for concurrent I/O-bound tasks within one process. Web servers commonly run multiple worker processes, each handling many concurrent requests.",
+        deeper:"The GIL lets only one thread execute Python bytecode at a time, so threads help with I/O waits but not CPU parallelism — processes do. Thread pools (and run_in_executor) let you offload blocking calls without stalling an async event loop. Gunicorn/Uvicorn workers = processes; inside each, async or a thread pool handles concurrency.",
+        resources:[]
+      },
+      {
+        q:"Difference between multiprocessing and asyncio in AI workloads",
+        answer:"asyncio gives single-threaded concurrency for I/O-bound work (many API/DB/model-server calls waiting at once) with low overhead. multiprocessing gives true parallelism across cores for CPU-bound work (preprocessing, local CPU inference) by sidestepping the GIL, at the cost of process overhead and memory duplication.",
+        deeper:"Rule of thumb: I/O-bound → asyncio; CPU-bound → multiprocessing; GPU inference is usually treated as I/O from the app's view (await a separate server). They compose — an async web layer dispatching to a process pool or GPU workers is a common, scalable pattern. Threads sit in between, good for blocking I/O but capped by the GIL on CPU.",
+        resources:[
+          {label:"Concurrency in Python (Real Python)", url:"https://realpython.com/python-concurrency/", kind:"blog"}
+        ]
+      },
+      {
+        q:"How would you stream LLM responses token by token?",
+        answer:"Generate with streaming enabled and push tokens to the client as they're produced using Server-Sent Events (SSE) or a WebSocket — in FastAPI, return a StreamingResponse over an async generator. This slashes perceived latency because the user sees output immediately instead of waiting for the full completion.",
+        deeper:"SSE is the common, simple choice for one-way token streams (text/event-stream); WebSockets fit bidirectional needs. The whole path must be async and unbuffered end to end — a blocking step or proxy buffering defeats streaming. You're optimizing time-to-first-token, the metric users feel most.",
+        resources:[
+          {label:"FastAPI StreamingResponse", url:"https://fastapi.tiangolo.com/advanced/custom-response/", kind:"docs"}
+        ]
+      },
+      {
+        q:"How would you design logging for AI systems?",
+        answer:"Use structured (JSON) logs with a request/trace ID propagated across services, capturing inputs, model/version, latency, token counts, cost, and outcomes — while redacting PII. Add distributed tracing and ship logs to a central, queryable store so you can reproduce and debug any specific request.",
+        deeper:"AI logging needs extra fields beyond normal backend logs: prompt/response (or hashes), model version, retrieved context, confidence, and cost per call — essential for evaluating quality and debugging hallucinations. Correlation IDs tie a user request across web → retrieval → model. Balance observability with privacy: redact or hash sensitive content and set retention policies.",
+        resources:[]
+      },
+      {
+        q:"How would you secure an AI API in production?",
+        answer:"Require authentication (API keys/OAuth) and per-key authorization, enforce rate limits and quotas, validate and sanitize inputs, and filter inputs/outputs for prompt injection and sensitive data. Run over TLS, keep secrets in a vault, log/audit access, and apply least privilege to any tools the model can call.",
+        deeper:"AI APIs inherit normal web security (authn/z, TLS, input validation, rate limiting) and add LLM-specific risks from the OWASP LLM Top 10: prompt injection, sensitive-data leakage, insecure output handling, and excessive agency. The recurring theme is least privilege and treating model output as untrusted before it triggers any action.",
+        resources:[
+          {label:"OWASP API Security Top 10", url:"https://owasp.org/www-project-api-security/", kind:"docs"},
+          {label:"OWASP LLM Top 10", url:"https://owasp.org/www-project-top-10-for-large-language-model-applications/", kind:"docs"}
+        ]
+      }
+    ]
+  }
+];
+
+/* ============================================================
+   RENDER + INTERACTION
+   ============================================================ */
+const KIND_LABEL = {youtube:"YT", blog:"Blog", repo:"Repo", docs:"Docs", paper:"Paper"};
+const STORE_KEY = "ml_interview_reviewed_v1";
+
+// safe storage (degrades silently in sandboxes)
+const store = {
+  load(){ try{ return new Set(JSON.parse(localStorage.getItem(STORE_KEY)||"[]")); }catch(e){ return new Set(); } },
+  save(set){ try{ localStorage.setItem(STORE_KEY, JSON.stringify([...set])); }catch(e){} }
+};
+let reviewed = store.load();
+
+const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// allow our inline <code> tags in answers while escaping everything else
+function richText(s){
+  return esc(s).replace(/&lt;code&gt;/g,'<code>').replace(/&lt;\/code&gt;/g,'</code>');
+}
+
+let qIndex = 0;
+const allCards = [];
+
+function buildNav(){
+  const nav = document.getElementById('nav');
+  const mobile = document.getElementById('mobile-bar');
+  DATA.forEach(cat=>{
+    const a = document.createElement('a');
+    a.href = '#sec-'+cat.id;
+    a.innerHTML = `<span class="dot" style="background:${cat.hex}"></span>${cat.title}<span class="n">${cat.questions.length}</span>`;
+    nav.appendChild(a);
+
+    const m = document.createElement('a');
+    m.href = '#sec-'+cat.id;
+    m.innerHTML = `<span class="dot" style="background:${cat.hex}"></span>${cat.short}`;
+    mobile.appendChild(m);
+  });
+}
+
+function buildSections(){
+  const root = document.getElementById('sections');
+  DATA.forEach(cat=>{
+    const sec = document.createElement('section');
+    sec.className = 'section';
+    sec.id = 'sec-'+cat.id;
+    sec.style.setProperty('--accent', cat.accent);
+
+    sec.innerHTML = `
+      <div class="section-head">
+        <div class="chip" style="background:${cat.hex}">${cat.short.slice(0,2).toUpperCase()}</div>
+        <h3>${cat.title}</h3>
+        <span class="meta">${cat.questions.length} questions</span>
+      </div>`;
+
+    cat.questions.forEach((item)=>{
+      qIndex++;
+      const num = qIndex;
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.style.setProperty('--accent', cat.accent);
+      const cid = 'q'+num;
+
+      const haystack = (item.q + ' ' + item.answer + ' ' + item.deeper + ' ' + (item.resources||[]).map(r=>r.label).join(' ')).toLowerCase();
+
+      let resHTML = '';
+      if(item.resources && item.resources.length){
+        resHTML = `<div class="block"><div class="label">Go build the intuition</div><div class="resources">` +
+          item.resources.map(r=>`
+            <a class="res" href="${r.url}" target="_blank" rel="noopener">
+              <span class="ic ${r.kind}">${KIND_LABEL[r.kind]?KIND_LABEL[r.kind][0]:'•'}</span>
+              ${esc(r.label)}
+              <span class="kind">${KIND_LABEL[r.kind]||r.kind}</span>
+            </a>`).join('') +
+          `</div></div>`;
+      }
+
+      let formulaHTML = '';
+      if(item.formula){
+        formulaHTML = `<div class="formula"><span class="ftag">${esc(item.formula.tag)}</span><span class="fmath">${esc(item.formula.math)}</span></div>`;
+      }
+
+      card.innerHTML = `
+        <div class="card-spine">
+          <div class="spine" style="background:${cat.hex}"></div>
+          <div class="card-body">
+            <div class="q-head" data-toggle>
+              <span class="q-num">${String(num).padStart(2,'0')}</span>
+              <span class="q-text">${esc(item.q)}</span>
+              <span class="q-actions">
+                <button class="review-btn" title="Mark as reviewed" aria-label="Mark as reviewed">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </button>
+                <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </span>
+            </div>
+            <div class="answer">
+              <div class="answer-inner">
+                <div class="block answer-block">
+                  <div class="label">Answer it like this</div>
+                  <p>${richText(item.answer)}</p>
+                </div>
+                <div class="block">
+                  <div class="label">The deeper why</div>
+                  <p>${richText(item.deeper)}</p>
+                </div>
+                ${formulaHTML}
+                ${resHTML}
+              </div>
+            </div>
+          </div>
+        </div>`;
+
+      // toggle open/close
+      const head = card.querySelector('[data-toggle]');
+      const ans = card.querySelector('.answer');
+      head.addEventListener('click', (e)=>{
+        if(e.target.closest('.review-btn')) return;
+        toggleCard(card, ans);
+      });
+
+      // review
+      const rb = card.querySelector('.review-btn');
+      if(reviewed.has(cid)) card.classList.add('reviewed');
+      rb.addEventListener('click', ()=>{
+        if(reviewed.has(cid)){ reviewed.delete(cid); card.classList.remove('reviewed'); }
+        else { reviewed.add(cid); card.classList.add('reviewed'); }
+        store.save(reviewed); updateProgress();
+      });
+
+      card.dataset.haystack = haystack;
+      card.dataset.cid = cid;
+      sec.appendChild(card);
+      allCards.push({card, sec, ans});
+    });
+
+    root.appendChild(sec);
+  });
+}
+
+function toggleCard(card, ans, force){
+  const willOpen = force===undefined ? !card.classList.contains('open') : force;
+  if(willOpen){
+    card.classList.add('open');
+    ans.style.maxHeight = ans.scrollHeight + 'px';
+  } else {
+    card.classList.remove('open');
+    ans.style.maxHeight = '0px';
+  }
+}
+
+function updateProgress(){
+  const n = reviewed.size;
+  document.getElementById('rev-count').textContent = n;
+  document.getElementById('progress-fill').style.width = (n/50*100) + '%';
+}
+
+/* search */
+const searchEl = document.getElementById('search');
+const resultCount = document.getElementById('result-count');
+const noResults = document.getElementById('no-results');
+
+function highlight(card, term){
+  const qt = card.querySelector('.q-text');
+  const raw = qt.textContent;
+  if(!term){ qt.innerHTML = esc(raw); return; }
+  const re = new RegExp('('+term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig');
+  qt.innerHTML = esc(raw).replace(re,'<mark>$1</mark>');
+}
+
+function runSearch(){
+  const term = searchEl.value.trim().toLowerCase();
+  let shown = 0;
+  allCards.forEach(({card})=>{
+    const match = !term || card.dataset.haystack.includes(term);
+    card.style.display = match ? '' : 'none';
+    if(match){ shown++; highlight(card, term); }
+  });
+  // hide empty sections
+  document.querySelectorAll('.section').forEach(sec=>{
+    const any = [...sec.querySelectorAll('.card')].some(c=>c.style.display!=='none');
+    sec.style.display = any ? '' : 'none';
+  });
+  resultCount.textContent = shown + (shown===1?' shown':' shown');
+  noResults.style.display = shown===0 ? '' : 'none';
+}
+
+searchEl.addEventListener('input', runSearch);
+
+/* expand-all toggle */
+let allOpen = false;
+const toggleAllBtn = document.getElementById('toggle-all');
+toggleAllBtn.addEventListener('click', ()=>{
+  allOpen = !allOpen;
+  allCards.forEach(({card, ans})=>{ if(card.style.display!=='none') toggleCard(card, ans, allOpen); });
+  toggleAllBtn.textContent = allOpen ? 'Collapse all' : 'Expand all';
+});
+
+/* reset review */
+document.getElementById('reset-review').addEventListener('click', ()=>{
+  reviewed = new Set(); store.save(reviewed);
+  document.querySelectorAll('.card.reviewed').forEach(c=>c.classList.remove('reviewed'));
+  updateProgress();
+});
+
+/* keyboard: "/" focus, Esc clear */
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='/' && document.activeElement!==searchEl){ e.preventDefault(); searchEl.focus(); }
+  if(e.key==='Escape' && document.activeElement===searchEl){ searchEl.value=''; runSearch(); searchEl.blur(); }
+});
+
+/* keep open cards sized on resize */
+let rt;
+window.addEventListener('resize', ()=>{
+  clearTimeout(rt);
+  rt = setTimeout(()=>{ allCards.forEach(({card,ans})=>{ if(card.classList.contains('open')) ans.style.maxHeight = ans.scrollHeight+'px'; }); },120);
+});
+
+/* init */
+buildNav();
+buildSections();
+updateProgress();
+runSearch();
+</script>
+</body>
+</html>
